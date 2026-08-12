@@ -1,0 +1,6 @@
+{
+  "name": "validador-psh-2026",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Validador de Projetos | Prêmio Ser Humano 2026 — front-end estático + backend serverless (Vercel) que guarda a chave de API da Anthropic do lado do servidor."
+}

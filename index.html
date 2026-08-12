@@ -658,19 +658,25 @@ async function callClaude(system, userContent){
   };
 
   if(!backendUnavailable){
+    let backendResp = null;
+    let backendNetworkFailed = false;
     try{
       const backendHeaders = {'Content-Type':'application/json'};
       if(state.siteCode){ backendHeaders['x-site-code'] = state.siteCode; }
-      const backendResp = await fetch(BACKEND_ENDPOINT, {
+      backendResp = await fetch(BACKEND_ENDPOINT, {
         method:'POST', headers: backendHeaders, body: JSON.stringify(payload)
       });
-      if(backendResp.status === 404){
-        backendUnavailable = true; // backend não está hospedado junto — usa modo direto a partir de agora
-      }else{
-        return await handleClaudeResponse(backendResp);
-      }
     }catch(e){
+      backendNetworkFailed = true; // falha de rede de verdade ao tentar alcançar o backend
+    }
+    if(backendNetworkFailed){
       backendUnavailable = true;
+    }else if(backendResp.status === 404){
+      backendUnavailable = true; // backend não está hospedado junto — usa modo direto a partir de agora
+    }else{
+      // Backend respondeu (com sucesso ou erro de aplicação) — trata e propaga normalmente,
+      // sem cair no modo direto por engano.
+      return await handleClaudeResponse(backendResp);
     }
   }
 
